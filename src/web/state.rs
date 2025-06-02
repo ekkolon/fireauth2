@@ -5,7 +5,7 @@ use crate::impl_actix_from_request;
 const DEFAULT_FIREAUTH2_REDIRECT_URI_PATH: &str = "/callback";
 const DEFAULT_FIREAUTH2_SESSION_COOKIE_NAME: &str = "FIREAUTH2_SESSION";
 const DEFAULT_FIREAUTH2_SESSION_COOKIE_MAX_AGE: u16 = 180; // in seconds
-const DEFAULT_FIREAUTH2_FIRESTORE_COLLECTION: &str = "users";
+const DEFAULT_FIREAUTH2_FIRESTORE_COLLECTION: &str = "googleUsers";
 const DEFAULT_FIREAUTH2_ENABLE_EXISTING_TOKEN_REVOCATION: bool = false;
 
 #[derive(Debug, Clone)]
