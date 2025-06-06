@@ -60,6 +60,9 @@ pub enum Error {
     #[error("Firebase ID token is missing Google identity claims")]
     FirebaseUserMissingGoogleIdentity,
 
+    #[error("No Google user found")]
+    NoGoogleUserFound,
+
     // Domain errors
     #[error(transparent)]
     InvalidRedirectUrl(#[from] std::string::FromUtf8Error),
@@ -104,6 +107,7 @@ impl ResponseError for Error {
             | Error::InvalidRedirectUrl(_)
             | Error::InvalidPromptValue(_)
             | Error::MissingRedirectUrl
+            | Error::NoGoogleUserFound
             | Error::UrlParse(_)
             | Error::TokenVerification(_) => StatusCode::BAD_REQUEST,
 
