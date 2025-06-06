@@ -35,6 +35,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "actix-firebase-auth"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0d21ae95d1c86eeffa73b316b750b9d2f0d485786580f64bcba4b0419317bb1c"
+dependencies = [
+ "actix-web",
+ "actix-web-httpauth",
+ "base64",
+ "futures",
+ "jsonwebtoken",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.12",
+ "tracing",
+]
+
+[[package]]
 name = "actix-http"
 version = "3.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -815,6 +833,7 @@ name = "fireauth2"
 version = "0.1.0"
 dependencies = [
  "actix-cors",
+ "actix-firebase-auth",
  "actix-web",
  "actix-web-httpauth",
  "base64",

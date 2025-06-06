@@ -50,9 +50,15 @@ pub enum Error {
     #[error(transparent)]
     OAuthConfig(#[from] oauth2::ConfigurationError),
 
-    // Firestore Errors
+    // Firebase Errors
     #[error(transparent)]
     Firestore(#[from] firestore::errors::FirestoreError),
+
+    #[error(transparent)]
+    FirebaseAuth(#[from] actix_firebase_auth::Error),
+
+    #[error("Firebase ID token is missing Google identity claims")]
+    FirebaseUserMissingGoogleIdentity,
 
     // Domain errors
     #[error(transparent)]
@@ -87,6 +93,7 @@ impl ResponseError for Error {
     fn status_code(&self) -> StatusCode {
         match self {
             Error::Actix(err) => err.as_response_error().status_code(),
+            Error::FirebaseAuth(err) => err.error_response().status(),
 
             Error::Firestore(_) | Error::Http(_) | Error::TokenRevocationFailed { .. } => {
                 StatusCode::BAD_GATEWAY
