@@ -53,9 +53,10 @@ impl Display for AuthSuccessRedirectResponse {
         let expires_in = self.expires_in().map(|d| d.as_secs()).unwrap_or(0);
         write!(
             f,
-            "{}#access_token={}&expires_in={}&issued_at={}",
+            "{}#access_token={}&id_token={}&expires_in={}&issued_at={}",
             self.redirect_url,
             self.access_token().secret(),
+            self.extra_fields().id_token(),
             expires_in,
             issued_at
         )
@@ -114,6 +115,7 @@ impl ExchangeRefreshTokenRequest {
 #[serde(rename_all = "camelCase")]
 pub struct ExchangeRefreshTokenResponse {
     pub(crate) access_token: String,
+    pub(crate) id_token: String,
     pub(crate) issued_at: i64,
     pub(crate) expires_in: u64,
 }
@@ -125,6 +127,7 @@ impl From<GoogleOAuthTokenResponse> for ExchangeRefreshTokenResponse {
         let access_token = value.access_token().clone();
         Self {
             access_token: access_token.into_secret(),
+            id_token: value.extra_fields().id_token().to_owned(),
             issued_at,
             expires_in,
         }

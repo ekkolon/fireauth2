@@ -127,7 +127,7 @@ impl GoogleOAuthClient {
         extra_params: &RequestAccessTokenExtraParams,
     ) -> RequestAccessTokenResponse {
         let (pkce_challenge, pkce_verifier) = PkceCodeChallenge::new_random_sha256();
-
+        
         let mut client = self
             .client
             .authorize_url(CsrfToken::new_random)
