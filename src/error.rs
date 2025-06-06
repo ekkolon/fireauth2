@@ -50,9 +50,18 @@ pub enum Error {
     #[error(transparent)]
     OAuthConfig(#[from] oauth2::ConfigurationError),
 
-    // Firestore Errors
+    // Firebase Errors
     #[error(transparent)]
     Firestore(#[from] firestore::errors::FirestoreError),
+
+    #[error(transparent)]
+    FirebaseAuth(#[from] actix_firebase_auth::Error),
+
+    #[error("Firebase ID token is missing Google identity claims")]
+    FirebaseUserMissingGoogleIdentity,
+
+    #[error("No Google user found")]
+    NoGoogleUserFound,
 
     // Domain errors
     #[error(transparent)]
@@ -61,8 +70,8 @@ pub enum Error {
     #[error("Invalid prompt value: {0}")]
     InvalidPromptValue(String),
 
-    #[error("{0}")]
-    TokenExchangeFailed(String),
+    #[error("Failed to exchange token: {because}")]
+    TokenExchangeFailed { because: String },
 
     #[error("Failed to revoke token: {because}")]
     TokenRevocationFailed { because: String },
@@ -87,15 +96,18 @@ impl ResponseError for Error {
     fn status_code(&self) -> StatusCode {
         match self {
             Error::Actix(err) => err.as_response_error().status_code(),
+            Error::FirebaseAuth(err) => err.error_response().status(),
 
             Error::Firestore(_) | Error::Http(_) | Error::TokenRevocationFailed { .. } => {
                 StatusCode::BAD_GATEWAY
             }
 
             Error::FailedToExtractAuthCookie { .. }
+            | Error::FirebaseUserMissingGoogleIdentity
             | Error::InvalidRedirectUrl(_)
             | Error::InvalidPromptValue(_)
             | Error::MissingRedirectUrl
+            | Error::NoGoogleUserFound
             | Error::UrlParse(_)
             | Error::TokenVerification(_) => StatusCode::BAD_REQUEST,
 
@@ -104,7 +116,7 @@ impl ResponseError for Error {
             | Error::Net(_)
             | Error::Base64(_)
             | Error::Json(_)
-            | Error::TokenExchangeFailed(_)
+            | Error::TokenExchangeFailed { .. }
             | Error::Io(_)
             | Error::OAuthConfig(_)
             | Error::ParseString(_)

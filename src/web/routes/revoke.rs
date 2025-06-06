@@ -1,23 +1,18 @@
-use crate::Result;
 use crate::client::GoogleOAuthClient;
-use actix_web::{Either, HttpResponse, post, web};
+use crate::web::repositories::GoogleUserRepository;
+use crate::{Result, models::user::GoogleUserId};
+use actix_firebase_auth::FirebaseUser;
+use actix_web::{HttpResponse, post, web};
 use oauth2::{AccessToken, RefreshToken, StandardRevocableToken};
 use serde::Deserialize;
 
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct RevokeAccessTokenBody {
+struct RevokeTokenBody {
     access_token: AccessToken,
+    #[serde(default)]
+    revoke_refresh_token: bool,
 }
-
-#[derive(Debug, Clone, Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct RevokeRefreshTokenBody {
-    refresh_token: RefreshToken,
-}
-
-// Accepts either an access token or refresh token in JSON form.
-type RevokeTokenBody = Either<web::Json<RevokeAccessTokenBody>, web::Json<RevokeRefreshTokenBody>>;
 
 /// POST `/revoke`
 ///
@@ -60,14 +55,30 @@ type RevokeTokenBody = Either<web::Json<RevokeAccessTokenBody>, web::Json<Revoke
 #[post("/revoke")]
 pub async fn revoke_token(
     oauth2: GoogleOAuthClient,
-    payload: RevokeTokenBody,
+    payload: web::Json<RevokeTokenBody>,
+    firebase_user: FirebaseUser,
+    google_user_repo: GoogleUserRepository,
 ) -> Result<HttpResponse> {
-    let revocable_token = match payload {
-        Either::Left(ref json) => StandardRevocableToken::AccessToken(json.access_token.clone()),
-        Either::Right(ref json) => StandardRevocableToken::RefreshToken(json.refresh_token.clone()),
-    };
+    let RevokeTokenBody {
+        access_token,
+        revoke_refresh_token,
+    } = payload.into_inner();
 
+    let revocable_token = StandardRevocableToken::AccessToken(access_token);
     oauth2.revoke_token(revocable_token).await?;
 
+    if revoke_refresh_token {
+        let google_user_id = GoogleUserId::try_from(&firebase_user)?;
+        let google_user = google_user_repo.get(&*google_user_id).await?;
+
+        let refresh_token = google_user
+            .and_then(|user| user.refresh_token)
+            .map(RefreshToken::new)
+            .map(StandardRevocableToken::RefreshToken);
+
+        if let Some(token) = refresh_token {
+            oauth2.revoke_token(token).await?;
+        }
+    }
     Ok(HttpResponse::Ok().body(()))
 }

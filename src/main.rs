@@ -1,3 +1,4 @@
+use actix_firebase_auth::FirebaseAuth;
 use actix_web::{App, HttpServer, middleware, web::Data};
 use fireauth2::GoogleOAuthClient;
 use fireauth2::web::AppState;
@@ -20,6 +21,7 @@ async fn main() -> fireauth2::Result<()> {
 
     // Initialize Firestore client using the Google project ID
     let project_id = google_oauth.project_id();
+    let firebase_auth = Arc::new(FirebaseAuth::new(project_id).await?);
     let firestore = FirestoreDb::new(project_id).await?;
 
     // Create Google user repository with Firestore and collection name
@@ -33,6 +35,7 @@ async fn main() -> fireauth2::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(Data::from(app_state.clone()))
+            .app_data(Data::from(firebase_auth.clone()))
             .app_data(Data::from(google_oauth.clone()))
             .app_data(Data::from(google_user_repo.clone()))
             .wrap(actix_cors::Cors::permissive()) // TODO: tighten CORS in production

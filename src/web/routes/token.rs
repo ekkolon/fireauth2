@@ -1,5 +1,8 @@
 use crate::client::GoogleOAuthClient;
+use crate::models::user::GoogleUserId;
+use crate::web::repositories::GoogleUserRepository;
 use crate::{ExchangeRefreshTokenRequest, ExchangeRefreshTokenResponse, Result};
+use actix_firebase_auth::FirebaseUser;
 use actix_web::{HttpResponse, post, web};
 
 /// POST `/token`
@@ -58,9 +61,23 @@ use actix_web::{HttpResponse, post, web};
 #[post("/token")]
 pub async fn exchange_refresh_token(
     oauth2: web::Data<GoogleOAuthClient>,
-    payload: web::Json<ExchangeRefreshTokenRequest>,
+    firebase_user: FirebaseUser,
+    google_user_repo: GoogleUserRepository,
 ) -> Result<HttpResponse> {
-    let token = oauth2.exchange_refresh_token(payload.into_inner()).await?;
+    let google_user_id = GoogleUserId::try_from(&firebase_user)?;
+    let google_user = google_user_repo
+        .get(&*google_user_id)
+        .await?
+        .ok_or(crate::Error::NoGoogleUserFound)?;
+
+    let refresh_token = google_user
+        .refresh_token
+        .ok_or(crate::Error::TokenExchangeFailed {
+            because: "No refresh token found for user".into(),
+        })
+        .map(ExchangeRefreshTokenRequest::new)?;
+
+    let token = oauth2.exchange_refresh_token(refresh_token).await?;
     let body = ExchangeRefreshTokenResponse::from(token);
     Ok(HttpResponse::Ok().json(body))
 }

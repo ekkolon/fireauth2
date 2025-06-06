@@ -88,7 +88,9 @@ impl GoogleOAuthClient {
             .exchange_refresh_token(&request.refresh_token)
             .request_async(&self.http_client)
             .await
-            .map_err(|err| crate::Error::TokenExchangeFailed(err.to_string()))?;
+            .map_err(|err| crate::Error::TokenExchangeFailed {
+                because: err.to_string(),
+            })?;
         Ok(token_result)
     }
 
@@ -111,7 +113,9 @@ impl GoogleOAuthClient {
         let token_result = client
             .request_async(&self.http_client)
             .await
-            .map_err(|err| crate::Error::TokenExchangeFailed(err.to_string()))?;
+            .map_err(|err| crate::Error::TokenExchangeFailed {
+                because: err.to_string(),
+            })?;
 
         Ok(token_result)
     }
@@ -123,7 +127,7 @@ impl GoogleOAuthClient {
         extra_params: &RequestAccessTokenExtraParams,
     ) -> RequestAccessTokenResponse {
         let (pkce_challenge, pkce_verifier) = PkceCodeChallenge::new_random_sha256();
-
+        
         let mut client = self
             .client
             .authorize_url(CsrfToken::new_random)
