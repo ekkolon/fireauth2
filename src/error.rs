@@ -67,8 +67,8 @@ pub enum Error {
     #[error("Invalid prompt value: {0}")]
     InvalidPromptValue(String),
 
-    #[error("{0}")]
-    TokenExchangeFailed(String),
+    #[error("Failed to exchange token: {because}")]
+    TokenExchangeFailed { because: String },
 
     #[error("Failed to revoke token: {because}")]
     TokenRevocationFailed { because: String },
@@ -112,7 +112,7 @@ impl ResponseError for Error {
             | Error::Net(_)
             | Error::Base64(_)
             | Error::Json(_)
-            | Error::TokenExchangeFailed(_)
+            | Error::TokenExchangeFailed { .. }
             | Error::Io(_)
             | Error::OAuthConfig(_)
             | Error::ParseString(_)
