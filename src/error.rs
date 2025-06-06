@@ -100,6 +100,7 @@ impl ResponseError for Error {
             }
 
             Error::FailedToExtractAuthCookie { .. }
+            | Error::FirebaseUserMissingGoogleIdentity
             | Error::InvalidRedirectUrl(_)
             | Error::InvalidPromptValue(_)
             | Error::MissingRedirectUrl
