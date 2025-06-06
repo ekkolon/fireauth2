@@ -102,6 +102,14 @@ pub struct ExchangeRefreshTokenRequest {
     pub(crate) refresh_token: RefreshToken,
 }
 
+impl ExchangeRefreshTokenRequest {
+    pub fn new(refresh_token: impl AsRef<str>) -> Self {
+        Self {
+            refresh_token: RefreshToken::new(refresh_token.as_ref().to_owned()),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ExchangeRefreshTokenResponse {
