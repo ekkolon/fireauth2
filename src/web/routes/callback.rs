@@ -1,7 +1,7 @@
 use crate::Result;
-use crate::client::AuthErrorRedirectResponse;
 use crate::client::{
-    AuthSuccessRedirectResponse, ExchangeAuthorizationCodeRequest, GoogleOAuthClient,
+    AuthRedirectErrorResponse, AuthRedirectSuccessResponse, ExchangeAuthorizationCodeRequest,
+    GoogleOAuthClient,
 };
 use crate::models::user::GoogleUser;
 use crate::web::AppState;
@@ -163,7 +163,7 @@ pub async fn exchange_authorization_code(
     };
 
     // Redirect to success handler with tokens in URL fragment
-    let redirect_url = AuthSuccessRedirectResponse::new(session.redirect_to, response);
+    let redirect_url = AuthRedirectSuccessResponse::new(session.redirect_to, response);
     let response = HttpResponse::Found()
         .append_header((header::LOCATION, redirect_url.to_string()))
         .finish();
@@ -173,7 +173,7 @@ pub async fn exchange_authorization_code(
 
 /// Redirects back to the client with an error encoded in the URL fragment.
 fn respond_with_error(redirect_url: Url, error: impl AsRef<str>) -> Result<HttpResponse> {
-    let redirect_url = AuthErrorRedirectResponse::new(redirect_url, error);
+    let redirect_url = AuthRedirectErrorResponse::new(redirect_url, error);
     let response = HttpResponse::Found()
         .append_header((header::LOCATION, redirect_url.to_string()))
         .finish();
