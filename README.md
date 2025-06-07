@@ -42,6 +42,24 @@ It is ideal for applications that require:
 
 ## Getting Started
 
+The quickest way to start using this project is by building a Docker image directly from this repository - assuming you have the [Docker CLI](https://www.docker.com/products/cli/) installed locally.
+
+### 1. Build
+
+```bash
+docker build -t fireauth2:latest https://github.com/ekkolon/fireauth2.git
+```
+
+### 2. Run
+
+> ℹ️ Copy the contents of [.env.example](./.env.example) and replace the placeholder values with your own.
+
+```bash
+docker run --env-file .env -p 8080:8080 fireauth2:latest
+```
+
+## Development
+
 Follow these steps to clone, build, and run **fireauth2** locally for development and testing purposes.
 
 ### Prerequisites
