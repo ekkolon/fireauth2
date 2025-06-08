@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
-/// Represents a Google user authenticated via OAuth2.
+/// Represents a Google user authenticated via `OAuth2`.
 ///
 /// Contains user identification, email, refresh token, and scopes.
 /// Sensitive fields like `email` and `refresh_token` are redacted in debug output for security.
@@ -15,10 +15,10 @@ pub struct GoogleUser {
     /// User's email address, if available.
     pub(crate) email: Option<String>,
 
-    /// OAuth2 refresh token, if present.
+    /// `OAuth2` refresh token, if present.
     pub(crate) refresh_token: Option<String>,
 
-    /// OAuth2 scopes granted to the user.
+    /// `OAuth2` scopes granted to the user.
     pub(crate) scope: Vec<String>,
 }
 

@@ -79,8 +79,7 @@ impl GoogleOAuthClientConfig {
 
     // (todo): Redact the secret to prevent accidentally exposing it
     pub(crate) fn client_secret(&self) -> ClientSecret {
-        let secret = ClientSecret::new(self.web.client_secret.clone());
-        secret
+        ClientSecret::new(self.web.client_secret.clone())
     }
 
     /// Parses Google OAuth 2.0 JSON from an base64-encoded string

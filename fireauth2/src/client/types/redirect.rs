@@ -51,8 +51,7 @@ impl fmt::Display for AuthRedirectResponse {
             }
             AuthRedirectResponse::Success { url, token } => {
                 let issued_at = chrono::Utc::now().timestamp();
-                let expires_in =
-                    token.expires_in().map(|d| d.as_secs()).unwrap_or(0);
+                let expires_in = token.expires_in().map_or(0, |d| d.as_secs());
                 write!(
                     f,
                     "{}#access_token={}&id_token={}&expires_in={}&issued_at={}",
