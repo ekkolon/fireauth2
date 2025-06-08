@@ -1,2 +1,2 @@
 serve:
-	cargo watch -w src -x "run"
+	cargo watch -w fireauth2-server -x "run"
