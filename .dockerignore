@@ -1,7 +1,16 @@
+attribution
 target
 examples
 docs
 Dockerfile
+docker-compose.yml
 .dockerignore
 .git
 .gitignore
+.github
+.markdownlint.yaml
+.yamlfmt.yaml
+deny.toml
+typos.toml
+rustfmt.toml
+Makefile
