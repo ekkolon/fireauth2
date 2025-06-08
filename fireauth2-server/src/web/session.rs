@@ -40,13 +40,13 @@ impl Session {
         csrf_token: &CsrfToken,
         redirect_to: Url,
         extra_params: RequestAccessTokenExtraParams,
-    ) -> Result<Self> {
-        Ok(Self {
+    ) -> Self {
+        Self {
             pkce_verifier: verifier.secret().to_string(),
             csrf_token: csrf_token.secret().to_string(),
             redirect_to,
             extra_params,
-        })
+        }
     }
 
     /// Serializes the payload into a secure, short-lived HTTP cookie.

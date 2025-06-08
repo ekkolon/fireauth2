@@ -1,7 +1,7 @@
 use oauth2::ExtraTokenFields;
 use serde::{Deserialize, Serialize};
 
-/// Represents additional fields returned in Google's OAuth2 token response.
+/// Represents additional fields returned in Google's `OAuth2` token response.
 ///
 /// Specifically, this struct captures the `id_token` field, which contains
 /// a JWT used to validate and extract user identity information.
@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 /// response deserialization.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GoogleOAuthExtraTokenFields {
-    /// The OpenID Connect ID token returned by Google.
+    /// The `OpenID` Connect ID token returned by Google.
     id_token: String,
 }
 

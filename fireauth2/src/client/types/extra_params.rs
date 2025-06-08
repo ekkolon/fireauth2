@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::{borrow::Cow, ops::Deref};
 
-/// Wrapper type for extra OAuth2 authorization request parameters.
+/// Wrapper type for extra `OAuth2` authorization request parameters.
 ///
 /// Provides a strongly typed representation of common extra parameters
 /// as well as utilities for conversion to query parameter formats.

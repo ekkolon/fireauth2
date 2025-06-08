@@ -48,4 +48,4 @@ Upon receiving this request, the server performs the following steps:
 Revoking a **refresh token** also invalidates all access tokens derived from it.
 Access tokens alone typically expire quickly, but revoking them may still be useful for immediate deauthorization.
 
-After revocation, the client *should* also clear any local session state and perform a full logout. This specifically means to remove the *access token* from the choosen storage instance (e.g localStorage, indexedDB) **and** *signOut* from Firebase.
+After revocation, the client *should* also clear any local session state and perform a full logout. This specifically means to remove the *access token* from the chosen storage instance (e.g localStorage, indexedDB) **and** *signOut* from Firebase.

@@ -23,7 +23,7 @@ pub enum Error {
     #[error(transparent)]
     UrlParse(#[from] url::ParseError),
 
-    /// HTTP request error from the OAuth2 HTTP client.
+    /// HTTP request error from the `OAuth2` HTTP client.
     #[error(transparent)]
     Http(#[from] oauth2::reqwest::Error),
 
@@ -32,7 +32,7 @@ pub enum Error {
     #[error(transparent)]
     TokenVerification(#[from] google_oauth::Error),
 
-    /// OAuth2 configuration error.
+    /// `OAuth2` configuration error.
     #[error(transparent)]
     OAuthConfig(#[from] oauth2::ConfigurationError),
 

@@ -77,7 +77,7 @@ pub async fn authorize(
         response.csrf_token(),
         redirect_uri,
         query.extra_params.clone(),
-    )?;
+    );
 
     let redirect_response = HttpResponse::Found()
         .append_header((header::LOCATION, response.url().to_string()))

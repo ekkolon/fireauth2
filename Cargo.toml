@@ -3,6 +3,7 @@ resolver = "3"
 members = ["fireauth2", "fireauth2-server"]
 
 [workspace.package]
+rust-version = "1.85"
 version = "0.1.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"

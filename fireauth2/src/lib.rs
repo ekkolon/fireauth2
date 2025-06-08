@@ -1,25 +1,25 @@
-//! # FireAuth2 — Google OAuth2 & Firebase Authentication Library
+//! # `FireAuth2` — Google `OAuth2` & Firebase Authentication Library
 //!
 //! This crate provides a comprehensive and strongly-typed Rust interface
-//! for integrating Google OAuth2 authentication flows with first-class Firebase
+//! for integrating Google `OAuth2` authentication flows with first-class Firebase
 //! Authentication support.
 //!
 //! ## Features
 //!
-//! - OAuth2 client handling including PKCE and CSRF protection.
+//! - `OAuth2` client handling including PKCE and CSRF protection.
 //! - Structured request and response models for token exchange, refresh, and revocation.
-//! - Support for Google-specific OAuth2 extensions like `id_token` handling.
+//! - Support for Google-specific `OAuth2` extensions like `id_token` handling.
 //! - Configurable authorization requests with support for extra parameters.
-//! - Convenience builders for constructing complex OAuth2 request configurations.
+//! - Convenience builders for constructing complex `OAuth2` request configurations.
 //! - **First-class Firebase Authentication integration:**  
 //!   - Automatic syncing of refresh tokens to Firestore for persistent session management.  
 //!   - Utilities for handling Firebase user identity and token lifecycle management.
 //!
 //! ## Modules
 //!
-//! - `client`: Core OAuth2 client implementations and helpers for Google OAuth2 flows, including Firebase Authentication integration.
+//! - `client`: Core `OAuth2` client implementations and helpers for Google `OAuth2` flows, including Firebase Authentication integration.
 //! - `error`: Error handling types and utilities used throughout the crate.
-//! - `models`: Data structures representing OAuth2 payloads, tokens, config options, and Firebase token extensions.
+//! - `models`: Data structures representing `OAuth2` payloads, tokens, config options, and Firebase token extensions.
 //! - `repositories`: Persistence layer abstractions such as token storage, revocation, and Firestore syncing.
 //!
 //! ## Usage
@@ -36,12 +36,12 @@
 //!
 //! ## Customization
 //!
-//! The crate supports customization of OAuth2 requests via additional parameters
+//! The crate supports customization of `OAuth2` requests via additional parameters
 //! and token introspection support, plus fine-grained control over Firestore token syncing.
 //!
 //! ## Example
 //!
-//! See the `client` module for examples demonstrating OAuth2 authorization code
+//! See the `client` module for examples demonstrating `OAuth2` authorization code
 //! exchange, token refresh, revocation workflows, and Firebase Authentication token management.
 //!
 //! ---

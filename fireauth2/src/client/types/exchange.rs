@@ -4,7 +4,7 @@ use url::Url;
 
 use crate::{RequestAccessTokenExtraParams, client::GoogleOAuthTokenResponse};
 
-/// Query parameters received after OAuth2 authorization redirect.
+/// Query parameters received after `OAuth2` authorization redirect.
 ///
 /// These represent the `code` and `state` parameters returned by the
 /// authorization server, which are required to exchange for an access token.
@@ -51,42 +51,49 @@ impl ExchangeAuthorizationCodeConfigBuilder {
     }
 
     /// Sets the authorization code to exchange.
+    #[must_use]
     pub fn code(mut self, code: impl Into<String>) -> Self {
         self.code = Some(AuthorizationCode::new(code.into()));
         self
     }
 
     /// Sets the PKCE code verifier associated with the authorization request.
+    #[must_use]
     pub fn pkce_verifier(mut self, verifier: impl Into<String>) -> Self {
         self.pkce_verifier = Some(PkceCodeVerifier::new(verifier.into()));
         self
     }
 
     /// Sets extra parameters to include in the access token request.
+    #[must_use]
     pub fn params(mut self, params: RequestAccessTokenExtraParams) -> Self {
         self.params = Some(params);
         self
     }
 
     /// Sets whether to revoke existing tokens upon exchanging the code.
+    #[must_use]
     pub fn revoke_existing_tokens(mut self, yes: bool) -> Self {
         self.revoke_existing_tokens = yes;
         self
     }
 
     /// Sets the redirect URL to send the user after the exchange completes.
+    #[must_use]
     pub fn redirect_to(mut self, url: Url) -> Self {
         self.redirect_to = Some(url);
         self
     }
 
     /// Sets the CSRF token associated with the authorization request.
+    #[must_use]
     pub fn csrf_token(mut self, csrf_token: impl Into<String>) -> Self {
         self.csrf_token = Some(csrf_token.into());
         self
     }
 
     /// Sets the state string used to validate the authorization response.
+    #[must_use]
     pub fn state(mut self, state: impl Into<String>) -> Self {
         self.state = Some(state.into());
         self
@@ -125,7 +132,7 @@ impl ExchangeAuthorizationCodeConfigBuilder {
 pub struct ExchangeRefreshTokenResponse {
     /// The new access token string.
     pub(crate) access_token: String,
-    /// The OpenID Connect ID token string.
+    /// The `OpenID` Connect ID token string.
     pub(crate) id_token: String,
     /// The UNIX timestamp when the token was issued.
     pub(crate) issued_at: i64,
@@ -136,7 +143,7 @@ pub struct ExchangeRefreshTokenResponse {
 impl From<GoogleOAuthTokenResponse> for ExchangeRefreshTokenResponse {
     fn from(value: GoogleOAuthTokenResponse) -> Self {
         let issued_at = chrono::Utc::now().timestamp();
-        let expires_in = value.expires_in().map(|d| d.as_secs()).unwrap_or(0);
+        let expires_in = value.expires_in().map_or(0, |d| d.as_secs());
         let access_token = value.access_token().clone();
         Self {
             access_token: access_token.into_secret(),

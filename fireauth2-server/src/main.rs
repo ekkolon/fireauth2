@@ -1,3 +1,5 @@
+#![allow(clippy::doc_markdown)]
+
 //! Rust server for handling Google OAuth 2.0 flows with first-class
 //! Firebase Authentication support.
 
@@ -19,7 +21,7 @@ use std::sync::Arc;
 async fn main() -> Result<()> {
     // Initialize environment variables and logging
     utils::env::init()?;
-    utils::logger::init()?;
+    utils::logger::init();
 
     // Determine the socket address to bind the server
     let socket_addr = utils::env::get_socket_addrs()?;
@@ -32,7 +34,7 @@ async fn main() -> Result<()> {
     let project_id = google_auth.project_id();
     let firebase_auth = FirebaseAuth::new(project_id).await.map(Arc::new)?;
 
-    log::info!("Starting HTTP server on {}", socket_addr);
+    log::info!("Starting HTTP server on {socket_addr}");
 
     HttpServer::new(move || {
         App::new()

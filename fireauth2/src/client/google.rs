@@ -12,9 +12,13 @@ use crate::{
 
 use firestore::FirestoreDb;
 use google_oauth::{GoogleAccessTokenPayload, GooglePayload};
+use oauth2::basic::{BasicErrorResponseType, BasicTokenType};
 use oauth2::{
-    basic::{BasicErrorResponseType, BasicTokenType},
-    *,
+    AuthType, Client, CsrfToken, EndpointNotSet, EndpointSet,
+    PkceCodeChallenge, RedirectUrl, RefreshToken, RevocationErrorResponseType,
+    StandardErrorResponse, StandardRevocableToken,
+    StandardTokenIntrospectionResponse, StandardTokenResponse, TokenResponse,
+    reqwest,
 };
 
 /// Type alias for Google's token response which includes `id_token` as an extra field.
@@ -38,46 +42,46 @@ type StandardClient = Client<
     EndpointSet,
 >;
 
-/// A high-level OAuth2 client tailored for Google, with support for ID token verification
+/// A high-level `OAuth2` client tailored for Google, with support for ID token verification
 /// and Firebase compatibility.
 #[derive(Clone)]
 pub struct GoogleOAuthClient {
-    repository: GoogleUserRepository,
     client: StandardClient,
     config: GoogleOAuthClientConfig,
     http_client: reqwest::Client,
+    repository: GoogleUserRepository,
     token_verifier: google_oauth::AsyncClient,
 }
 
 impl GoogleOAuthClient {
-    /// Initializes a new GoogleOAuthClient using environment-provided configuration.
+    /// Initializes a new `GoogleOAuthClient` using environment-provided configuration.
     /// Verifies configuration presence and sets up the internal OAuth client and verifier.
     pub async fn new() -> crate::Result<Self> {
         let config = GoogleOAuthClientConfig::from_env()?;
-        let client_id = config.client_id()?;
+        let client_id = config.client_id();
 
         let token_verifier = google_oauth::AsyncClient::new(client_id.as_str());
 
-        let client = Client::new(config.client_id()?)
+        let client = Client::new(client_id)
             .set_auth_type(AuthType::BasicAuth)
             .set_token_uri(config.token_uri()?)
             .set_auth_uri(config.auth_uri()?)
-            .set_client_secret(config.client_secret()?)
-            .set_redirect_uri(config.redirect_uri()?)
-            .set_revocation_url(config.revocation_url()?);
+            .set_client_secret(config.client_secret())
+            .set_redirect_uri(GoogleOAuthClientConfig::redirect_uri()?)
+            .set_revocation_url(GoogleOAuthClientConfig::revocation_url()?);
 
         // Explicitly disable redirects to avoid SSRF attack surface.
         let http_client = reqwest::ClientBuilder::new()
             .redirect(reqwest::redirect::Policy::none())
             .build()?;
         let firestore = FirestoreDb::new(config.project_id()).await?;
-        let repository = GoogleUserRepository::new(firestore, "googleUsers")?;
+        let repository = GoogleUserRepository::new(firestore, "googleUsers");
 
         Ok(Self {
             client,
-            repository,
             config,
             http_client,
+            repository,
             token_verifier,
         })
     }
@@ -128,6 +132,7 @@ impl GoogleOAuthClient {
 
     /// Exchanges an authorization code for an access token.
     /// This method also applies the PKCE verifier and any additional parameters.
+    #[expect(clippy::too_many_lines)]
     pub async fn exchange_authorization_code(
         &self,
         config: ExchangeAuthorizationCodeConfig,
@@ -228,7 +233,10 @@ impl GoogleOAuthClient {
                                 );
 
                             log::debug!("Preparing for token revocation");
-                            match self._revoke_token(revocable_token).await {
+                            match self
+                                .revoke_revocable_token(revocable_token)
+                                .await
+                            {
                                 Err(err) => {
                                     // TODO: Maybe return an error
                                     log::debug!(
@@ -236,8 +244,8 @@ impl GoogleOAuthClient {
                                         &err.to_string()
                                     );
                                 }
-                                Ok(_) => {
-                                    log::debug!("Token successfully revoked")
+                                Ok(()) => {
+                                    log::debug!("Token successfully revoked");
                                 }
                             }
                         }
@@ -290,7 +298,7 @@ impl GoogleOAuthClient {
             .client
             .authorize_url(CsrfToken::new_random)
             .set_pkce_challenge(pkce_challenge)
-            .add_scopes(self.config.scopes());
+            .add_scopes(GoogleOAuthClientConfig::scopes());
 
         for (name, value) in extra_params.to_extra_params() {
             client = client.add_extra_param(name.into_cow(), value);
@@ -309,7 +317,7 @@ impl GoogleOAuthClient {
         let token = StandardRevocableToken::AccessToken(
             config.access_token().to_owned(),
         );
-        self._revoke_token(token).await?;
+        self.revoke_revocable_token(token).await?;
 
         if config.revoke_refresh_token() {
             let google_user = self.repository.get(config.user_id()).await?;
@@ -320,7 +328,7 @@ impl GoogleOAuthClient {
                 .map(StandardRevocableToken::RefreshToken);
 
             if let Some(token) = refresh_token {
-                self._revoke_token(token).await?;
+                self.revoke_revocable_token(token).await?;
             }
         }
 
@@ -350,20 +358,21 @@ impl GoogleOAuthClient {
         Ok(payload)
     }
 
-    /// Sets the redirect URI for the OAuth2 client.
+    /// Sets the redirect URI for the `OAuth2` client.
     ///
     /// # Parameters
-    /// - `uri`: The URL to be used as the redirect URI in the OAuth2 flow.
+    /// - `uri`: The URL to be used as the redirect URI in the `OAuth2` flow.
     ///
     /// # Returns
     /// The updated builder instance with the redirect URI set.
+    #[must_use]
     pub fn with_redirect_uri(mut self, uri: url::Url) -> Self {
         let redirect_uri = RedirectUrl::from_url(uri);
         self.client = self.client.set_redirect_uri(redirect_uri);
         self
     }
 
-    async fn _revoke_token(
+    async fn revoke_revocable_token(
         &self,
         token: StandardRevocableToken,
     ) -> crate::Result<()> {
