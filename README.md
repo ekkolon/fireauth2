@@ -47,7 +47,7 @@ The quickest way to start using this project is by building a Docker image direc
 ### 1. Build
 
 ```bash
-docker build -t fireauth2:latest https://github.com/ekkolon/fireauth2.git
+docker build -t fireauth2:latest https://github.com/ekkolon/fireauth2.git#main:fireauth2-server
 ```
 
 ### 2. Run

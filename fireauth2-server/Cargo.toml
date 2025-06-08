@@ -1,0 +1,45 @@
+[package]
+name = "fireauth2-server"
+description = "Rust server for handling Google OAuth 2.0 flows with first-class Firebase Authentication support"
+readme = "./README.md"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+actix-cors = "0.7.1"
+actix-web = "4.11.0"
+actix-firebase-auth = { version = "0.5.0" }
+dotenvy = "0.15.7"
+env_logger = "0.11.3"
+fireauth2 = { path = "../fireauth2" }
+futures = "0.3.30"
+log = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+url = { workspace = true }
+urlencoding = { workspace = true }
+
+
+[lints.rust]
+# https://doc.rust-lang.org/rustc/lints/listing/allowed-by-default.html#allowed-by-default-lints
+unsafe_code = "warn"
+unsafe_op_in_unsafe_fn = "warn"
+missing-abi = "warn"
+missing_docs = "warn"
+
+[lints.clippy]
+# https://rust-lang.github.io/rust-clippy/master/
+# pedantic
+pedantic = { level = "warn", priority = -1 }
+must_use_candidate = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+
+# restriction
+undocumented_unsafe_blocks = "warn"
+multiple_unsafe_ops_per_block = "warn"
+allow_attributes = "warn"
