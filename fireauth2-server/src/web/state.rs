@@ -26,17 +26,17 @@ pub struct AppState {
 impl AppState {
     pub fn from_env() -> crate::Result<Self> {
         let redirect_uri_path = option_env!("FIREAUTH2_REDIRECT_URI_PATH")
-            .map(|v| v.to_owned())
+            .map(std::borrow::ToOwned::to_owned)
             .unwrap_or_else(|| DEFAULT_FIREAUTH2_REDIRECT_URI_PATH.to_string());
 
         let cookie_name = option_env!("FIREAUTH2_SESSION_COOKIE_NAME")
-            .map(|v| v.to_owned())
+            .map(std::borrow::ToOwned::to_owned)
             .unwrap_or_else(|| {
                 DEFAULT_FIREAUTH2_SESSION_COOKIE_NAME.to_string()
             });
 
         let cookie_max_age = option_env!("FIREAUTH2_SESSION_COOKIE_MAX_AGE")
-            .map(|v| v.to_owned())
+            .map(std::borrow::ToOwned::to_owned)
             .unwrap_or_else(|| {
                 DEFAULT_FIREAUTH2_SESSION_COOKIE_MAX_AGE.to_string()
             })
@@ -44,14 +44,14 @@ impl AppState {
 
         let firestore_collection_name =
             option_env!("FIREAUTH2_FIRESTORE_COLLECTION")
-                .map(|v| v.to_owned())
+                .map(std::borrow::ToOwned::to_owned)
                 .unwrap_or_else(|| {
                     DEFAULT_FIREAUTH2_FIRESTORE_COLLECTION.to_string()
                 });
 
         let enable_existing_token_revocation =
             option_env!("FIREAUTH2_ENABLE_EXISTING_TOKEN_REVOCATION")
-                .map(|v| v.to_owned())
+                .map(std::borrow::ToOwned::to_owned)
                 .unwrap_or_else(|| {
                     DEFAULT_FIREAUTH2_ENABLE_EXISTING_TOKEN_REVOCATION
                         .to_string()
@@ -59,8 +59,8 @@ impl AppState {
                 .parse::<bool>()?;
 
         Ok(Self {
-            cookie_max_age,
             cookie_name,
+            cookie_max_age,
             enable_existing_token_revocation,
             firestore_collection_name,
             redirect_uri_path,

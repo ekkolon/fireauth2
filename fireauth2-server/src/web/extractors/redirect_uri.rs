@@ -27,7 +27,7 @@ pub fn get_redirect_uri_from_request(
     let info = req.connection_info();
     let scheme = info.scheme();
     let host = info.host();
-    let origin = format!("{}://{}", scheme, host);
+    let origin = format!("{scheme}://{host}");
     let mut origin_url = url::Url::parse(&origin)?;
     origin_url.set_path(redirect_uri_path);
     Ok(origin_url)
@@ -57,7 +57,7 @@ impl actix_web::FromRequest for RedirectUrl {
                             err.to_string(),
                         ),
                     );
-                };
+                }
 
                 redirect_uri_result.unwrap()
             }
