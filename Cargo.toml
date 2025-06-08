@@ -6,7 +6,7 @@ members = ["fireauth2", "fireauth2-server"]
 rust-version = "1.85"
 version = "0.1.0"
 edition = "2024"
-license = "MIT OR Apache-2.0"
+license-file = "./LICENSE"
 repository = "https://github.com/ekkolon/fireauth2"
 authors = ["Nelson Dominguez <ekkolon@proton.me>"]
 

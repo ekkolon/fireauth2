@@ -19,6 +19,7 @@ ignore = [
 confidence-threshold = 0.8
 exceptions = []
 allow = [
+    "AGPL-3.0",
     "MIT",
     "Apache-2.0",
     "Unicode-3.0",
