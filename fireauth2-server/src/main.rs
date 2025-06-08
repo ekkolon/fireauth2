@@ -4,7 +4,6 @@
 //! Firebase Authentication support.
 
 mod error;
-mod models;
 mod utils;
 mod web;
 

@@ -1,6 +1,6 @@
+use crate::Result;
 use crate::web::extractors::FireAuth2;
-use crate::{Result, models::GoogleUserId};
-use actix_firebase_auth::FirebaseUser;
+use actix_firebase_auth::{FirebaseUser, GoogleUserId};
 use actix_web::{HttpResponse, post, web};
 use fireauth2::{TokenRevocationConfig, TokenRevocationPayload};
 
