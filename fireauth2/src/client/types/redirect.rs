@@ -6,7 +6,7 @@ use url::Url;
 
 use crate::client::GoogleOAuthTokenResponse;
 
-/// Represents the result of an OAuth2 authorization redirect.
+/// Represents the result of an `OAuth2` authorization redirect.
 ///
 /// This enum captures whether the redirect resulted in a success with a token
 /// or an error with an error message, along with the redirect URL.

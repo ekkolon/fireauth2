@@ -12,11 +12,11 @@ impl GoogleUserRepository {
     pub fn new(
         db: FirestoreDb,
         collection_name: impl AsRef<str>,
-    ) -> Result<GoogleUserRepository> {
-        Ok(GoogleUserRepository {
+    ) -> GoogleUserRepository {
+        GoogleUserRepository {
             collection_name: collection_name.as_ref().to_string(),
             db,
-        })
+        }
     }
 
     pub async fn get<ID: AsRef<str>>(

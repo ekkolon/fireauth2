@@ -18,7 +18,6 @@ pub struct TokenIntrospectionPayload {
     token: String,
 
     /// Optional hint about the type of the token.
-    #[allow(unused)]
     #[serde(default)]
     token_type_hint: TokenIntrospectionTypeHint,
 }

@@ -9,7 +9,6 @@ use std::fmt;
 #[serde(rename_all = "camelCase")]
 pub struct GoogleUser {
     /// Internal Firestore ID (not serialized).
-    #[allow(unused)]
     #[serde(alias = "_firestore_id", skip_serializing)]
     pub(crate) id: String,
 

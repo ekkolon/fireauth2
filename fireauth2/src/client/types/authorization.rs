@@ -109,7 +109,7 @@ impl<'a> IntoExtraParam<'a> for Vec<Prompt> {
     }
 }
 
-/// Represents optional parameters sent during the OAuth2 authorization request.
+/// Represents optional parameters sent during the `OAuth2` authorization request.
 /// These affect the server behavior for consent, prompt, and token refreshability.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RequestAccessTokenExtraParams {
@@ -182,7 +182,7 @@ where
 {
     struct StringOrBoolVisitor;
 
-    impl<'de> de::Visitor<'de> for StringOrBoolVisitor {
+    impl de::Visitor<'_> for StringOrBoolVisitor {
         type Value = bool;
 
         fn expecting(
@@ -244,7 +244,7 @@ where
     }
 }
 
-/// Represents optional parameters sent during the OAuth2 authorization request.
+/// Represents optional parameters sent during the `OAuth2` authorization request.
 ///
 /// These parameters influence the authorization server's behavior for consent prompts,
 /// login hints, token refreshability, and redirect handling.
@@ -259,7 +259,7 @@ pub struct RequestAccessTokenPayload {
     pub extra_params: RequestAccessTokenExtraParams,
 }
 
-/// Represents the response details after constructing an OAuth2 authorization request URL.
+/// Represents the response details after constructing an `OAuth2` authorization request URL.
 ///
 /// Contains the PKCE code verifier, CSRF token, and the constructed authorization URL
 /// to which the user should be redirected.

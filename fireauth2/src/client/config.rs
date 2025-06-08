@@ -12,10 +12,10 @@ pub struct GoogleOAuthWebClientConfig {
     project_id: String,
     auth_uri: url::Url,
     token_uri: url::Url,
-    #[allow(unused)]
+    #[expect(unused)]
     auth_provider_x509_cert_url: String,
     client_secret: String,
-    #[allow(unused)]
+    #[expect(unused)]
     redirect_uris: Vec<url::Url>,
     javascript_origins: Vec<url::Url>,
 }
@@ -36,10 +36,10 @@ impl GoogleOAuthClientConfig {
         "https://www.googleapis.com/auth/datastore",
     ];
 
-    pub fn scopes(&self) -> Vec<Scope> {
+    pub fn scopes() -> Vec<Scope> {
         Self::SCOPES
             .iter()
-            .map(|s| Scope::new(s.to_string()))
+            .map(|s| Scope::new((*s).to_owned()))
             .collect()
     }
 
@@ -53,8 +53,8 @@ impl GoogleOAuthClientConfig {
         Ok(url)
     }
 
-    pub fn revocation_url(&self) -> crate::Result<RevocationUrl> {
-        let url = RevocationUrl::new(Self::REVOCATION_URL.to_string())?;
+    pub fn revocation_url() -> crate::Result<RevocationUrl> {
+        let url = RevocationUrl::new(Self::REVOCATION_URL.to_owned())?;
         Ok(url)
     }
 
@@ -66,20 +66,21 @@ impl GoogleOAuthClientConfig {
         self.web.javascript_origins.as_ref()
     }
 
-    pub fn redirect_uri(&self) -> crate::Result<RedirectUrl> {
+    // TODO: May be no longer needed
+    pub fn redirect_uri() -> crate::Result<RedirectUrl> {
         let redirect_url = "http://localhost:8080/callback";
         let redirect_url = RedirectUrl::new(redirect_url.to_owned())?;
         Ok(redirect_url)
     }
 
-    pub fn client_id(&self) -> crate::Result<ClientId> {
-        Ok(ClientId::new(self.web.client_id.clone()))
+    pub fn client_id(&self) -> ClientId {
+        ClientId::new(self.web.client_id.clone())
     }
 
     // (todo): Redact the secret to prevent accidentally exposing it
-    pub(crate) fn client_secret(&self) -> crate::Result<ClientSecret> {
+    pub(crate) fn client_secret(&self) -> ClientSecret {
         let secret = ClientSecret::new(self.web.client_secret.clone());
-        Ok(secret)
+        secret
     }
 
     /// Parses Google OAuth 2.0 JSON from an base64-encoded string
