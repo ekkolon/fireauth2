@@ -1,5 +1,5 @@
 use crate::Result;
-use crate::web::extractors::FireAuth2;
+use crate::web::extractors::FireAuth;
 use crate::web::session::Session;
 use crate::web::utils::get_referer_url;
 use fireauth2::{RequestAccessTokenConfig, RequestAccessTokenPayload};
@@ -56,7 +56,7 @@ use url::Url;
 #[get("/authorize")]
 pub async fn authorize(
     req: HttpRequest,
-    fireauth2: FireAuth2,
+    fireauth2: FireAuth,
     query: web::Query<RequestAccessTokenPayload>,
 ) -> Result<HttpResponse> {
     let redirect_to = query

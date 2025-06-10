@@ -3,7 +3,7 @@ use super::extra_params::{
     ToExtraParams,
 };
 use super::scope::{Scope, ScopeList};
-use crate::GoogleOAuthTokenResponse;
+use crate::client::google::GoogleOAuthTokenResponse;
 
 use std::borrow::Cow;
 use std::fmt;

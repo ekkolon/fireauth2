@@ -10,7 +10,7 @@ mod web;
 pub use error::*;
 
 use crate::web::AppState;
-use fireauth2::GoogleOAuthClient;
+use fireauth2::FireAuthClient;
 
 use actix_firebase_auth::FirebaseAuth;
 use actix_web::{App, HttpServer, middleware, web::Data};
@@ -27,7 +27,7 @@ async fn main() -> Result<()> {
 
     // Setup shared application state
     let app_state = AppState::from_env().map(Arc::new)?;
-    let google_auth = GoogleOAuthClient::new().await.map(Arc::new)?;
+    let google_auth = FireAuthClient::new().await.map(Arc::new)?;
 
     // Initialize Firestore client using the Google project ID
     let project_id = google_auth.project_id();

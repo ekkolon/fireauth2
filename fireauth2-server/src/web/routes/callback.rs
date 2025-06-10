@@ -1,6 +1,6 @@
 use crate::Result;
 use crate::web::AppState;
-use crate::web::extractors::FireAuth2;
+use crate::web::extractors::FireAuth;
 use crate::web::session::Session;
 use fireauth2::{
     ExchangeAuthorizationCodeConfigBuilder,
@@ -47,7 +47,7 @@ use actix_web::{HttpRequest, HttpResponse, get, web};
 #[get("/callback")]
 pub async fn exchange_authorization_code(
     req: HttpRequest,
-    fireauth2: FireAuth2,
+    fireauth2: FireAuth,
     state: AppState,
     query: web::Query<ExchangeAuthorizationCodeQueryParams>,
 ) -> Result<HttpResponse> {

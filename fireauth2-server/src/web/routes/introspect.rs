@@ -1,5 +1,5 @@
 use crate::Result;
-use crate::web::extractors::FireAuth2;
+use crate::web::extractors::FireAuth;
 use actix_firebase_auth::FirebaseUser;
 use actix_web::{HttpResponse, Responder, post, web};
 use fireauth2::{TokenIntrospectionPayload, TokenIntrospectionTypeHint};
@@ -8,7 +8,7 @@ use serde_json::json;
 /// OAuth introspection endpoint
 #[post("/introspect")]
 pub async fn introspect(
-    fireauth2: FireAuth2,
+    fireauth2: FireAuth,
     form: web::Form<TokenIntrospectionPayload>,
     _firebase_user: FirebaseUser,
 ) -> Result<impl Responder> {

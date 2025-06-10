@@ -1,4 +1,4 @@
-mod fireauth2;
+mod fireauth;
 mod redirect_uri;
 
-pub use fireauth2::*;
+pub use fireauth::*;

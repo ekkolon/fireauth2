@@ -1,12 +1,9 @@
-mod authorization;
-mod config;
-mod extra_fields;
-mod google;
-mod introspection;
-mod revocation;
+pub(crate) mod authorization;
+pub(crate) mod config;
+pub(crate) mod google;
+pub(crate) mod introspection;
+pub(crate) mod revocation;
 
 pub use authorization::*;
-pub use extra_fields::*;
-pub use google::*;
 pub use introspection::*;
 pub use revocation::*;
