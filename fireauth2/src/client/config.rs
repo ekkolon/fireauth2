@@ -1,8 +1,5 @@
 use base64::Engine;
-use oauth2::{
-    AuthUrl, ClientId, ClientSecret, RedirectUrl, RevocationUrl, Scope,
-    TokenUrl,
-};
+use oauth2::{AuthUrl, ClientId, ClientSecret, RevocationUrl, TokenUrl};
 use serde::Deserialize;
 
 #[derive(Clone, Deserialize)]
@@ -29,20 +26,6 @@ impl GoogleOAuthClientConfig {
     const CLIENT_CONFIG_VAR: &'static str = "GOOGLE_OAUTH_CLIENT_CONFIG";
     const REVOCATION_URL: &'static str = "https://oauth2.googleapis.com/revoke";
 
-    const SCOPES: &'static [&str] = &[
-        "email",
-        "openid",
-        "profile",
-        "https://www.googleapis.com/auth/datastore",
-    ];
-
-    pub fn scopes() -> Vec<Scope> {
-        Self::SCOPES
-            .iter()
-            .map(|s| Scope::new((*s).to_owned()))
-            .collect()
-    }
-
     pub fn token_uri(&self) -> crate::Result<TokenUrl> {
         let url = TokenUrl::new(self.web.token_uri.to_string())?;
         Ok(url)
@@ -64,13 +47,6 @@ impl GoogleOAuthClientConfig {
 
     pub fn allowed_origins(&self) -> &Vec<url::Url> {
         self.web.javascript_origins.as_ref()
-    }
-
-    // TODO: May be no longer needed
-    pub fn redirect_uri() -> crate::Result<RedirectUrl> {
-        let redirect_url = "http://localhost:8080/callback";
-        let redirect_url = RedirectUrl::new(redirect_url.to_owned())?;
-        Ok(redirect_url)
     }
 
     pub fn client_id(&self) -> ClientId {

@@ -1,14 +1,12 @@
 use super::GoogleOAuthExtraTokenFields;
 use super::config::GoogleOAuthClientConfig;
 use super::types::{
-    RequestAccessTokenExtraParams, RequestAccessTokenResponse, ToExtraParams,
+    AuthRedirectResponse, ExchangeAuthorizationCodeConfig,
+    ExchangeRefreshTokenResponse, RequestAccessTokenConfig,
+    RequestAccessTokenResponse, ToExtraParams, TokenRevocationConfig,
 };
 use crate::models::GoogleUser;
 use crate::repositories::GoogleUserRepository;
-use crate::{
-    AuthRedirectResponse, ExchangeAuthorizationCodeConfig,
-    ExchangeRefreshTokenResponse, TokenRevocationConfig,
-};
 
 use firestore::FirestoreDb;
 use google_oauth::{GoogleAccessTokenPayload, GooglePayload};
@@ -67,7 +65,6 @@ impl GoogleOAuthClient {
             .set_token_uri(config.token_uri()?)
             .set_auth_uri(config.auth_uri()?)
             .set_client_secret(config.client_secret())
-            .set_redirect_uri(GoogleOAuthClientConfig::redirect_uri()?)
             .set_revocation_url(GoogleOAuthClientConfig::revocation_url()?);
 
         // Explicitly disable redirects to avoid SSRF attack surface.
@@ -233,18 +230,21 @@ impl GoogleOAuthClient {
     /// Returns the verifier, URL to redirect the user to, and the CSRF token to validate later.
     pub fn request_access_token(
         &self,
-        extra_params: &RequestAccessTokenExtraParams,
+        config: &RequestAccessTokenConfig,
     ) -> RequestAccessTokenResponse {
         let (pkce_challenge, pkce_verifier) =
             PkceCodeChallenge::new_random_sha256();
+
+        let scopes = config.scopes();
+        let extra_params = config.extra_params().to_extra_params();
 
         let mut client = self
             .client
             .authorize_url(CsrfToken::new_random)
             .set_pkce_challenge(pkce_challenge)
-            .add_scopes(GoogleOAuthClientConfig::scopes());
+            .add_scopes(scopes.to_vec());
 
-        for (name, value) in extra_params.to_extra_params() {
+        for (name, value) in extra_params {
             client = client.add_extra_param(name.into_cow(), value);
         }
 

@@ -1,6 +1,6 @@
 use std::{borrow::Cow, fmt, str::FromStr};
 
-use oauth2::{CsrfToken, PkceCodeVerifier};
+use oauth2::{CsrfToken, PkceCodeVerifier, Scope};
 use serde::{Deserialize, Serialize, de};
 use url::Url;
 
@@ -244,6 +244,65 @@ where
     }
 }
 
+// Deserializes either:
+// - a space-delimited string of scopes: "read write admin"
+// - an array of strings: ["read", "write", "admin"]
+//
+// It is an error if the resulting list is empty.
+fn deserialize_scopes<'de, D>(deserializer: D) -> Result<Vec<Scope>, D::Error>
+where
+    D: de::Deserializer<'de>,
+{
+    struct ScopesVisitor;
+
+    impl<'de> de::Visitor<'de> for ScopesVisitor {
+        type Value = Vec<Scope>;
+
+        fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+            formatter.write_str("a non-empty space-separated string or a non-empty list of scopes")
+        }
+
+        fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+        where
+            E: de::Error,
+        {
+            let scopes: Vec<Scope> = v
+                .split_whitespace()
+                .map(|s| Scope::new(s.to_owned()))
+                .collect();
+
+            if scopes.is_empty() {
+                return Err(E::custom(
+                    "scopes string must contain at least one scope",
+                ));
+            }
+
+            Ok(scopes)
+        }
+
+        fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+        where
+            A: de::SeqAccess<'de>,
+        {
+            let mut scopes = Vec::with_capacity(seq.size_hint().unwrap_or(0));
+
+            while let Some(item) = seq.next_element::<String>()? {
+                scopes.push(Scope::new(item));
+            }
+
+            if scopes.is_empty() {
+                return Err(de::Error::custom(
+                    "scopes array must contain at least one scope",
+                ));
+            }
+
+            Ok(scopes)
+        }
+    }
+
+    deserializer.deserialize_any(ScopesVisitor)
+}
+
 /// Represents optional parameters sent during the `OAuth2` authorization request.
 ///
 /// These parameters influence the authorization server's behavior for consent prompts,
@@ -253,10 +312,43 @@ pub struct RequestAccessTokenPayload {
     /// Optional URI to which the authorization server will redirect after authorization.
     pub redirect_uri: Option<String>,
 
+    /// User defined scopes to authorize
+    #[serde(rename = "scope", deserialize_with = "deserialize_scopes")]
+    pub scopes: Vec<Scope>,
+
     /// Additional parameters sent along with the authorization request,
     /// flattened into the top-level JSON object for convenience.
     #[serde(flatten)]
     pub extra_params: RequestAccessTokenExtraParams,
+}
+
+/// Represents configuration for an authorization request.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RequestAccessTokenConfig {
+    scopes: Vec<Scope>,
+
+    extra_params: RequestAccessTokenExtraParams,
+}
+
+impl RequestAccessTokenConfig {
+    /// User defined scopes to authorize
+    pub fn scopes(&self) -> &[Scope] {
+        self.scopes.as_slice()
+    }
+
+    /// Additional parameters sent along with the authorization request.
+    pub fn extra_params(&self) -> &RequestAccessTokenExtraParams {
+        &self.extra_params
+    }
+}
+
+impl From<&RequestAccessTokenPayload> for RequestAccessTokenConfig {
+    fn from(payload: &RequestAccessTokenPayload) -> Self {
+        RequestAccessTokenConfig {
+            scopes: payload.scopes.clone(),
+            extra_params: payload.extra_params.clone(),
+        }
+    }
 }
 
 /// Represents the response details after constructing an `OAuth2` authorization request URL.
@@ -301,5 +393,64 @@ impl RequestAccessTokenResponse {
     /// Returns a reference to the authorization URL.
     pub fn url(&self) -> &Url {
         &self.url
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde::Deserialize;
+    use serde_json::json;
+
+    #[derive(Debug, Deserialize)]
+    struct TokenResponse {
+        #[serde(deserialize_with = "deserialize_scopes")]
+        scopes: Vec<Scope>,
+    }
+
+    #[test]
+    fn test_valid_string() {
+        let json = json!({ "scopes": "read write" });
+        let parsed: TokenResponse = serde_json::from_value(json).unwrap();
+        assert_eq!(
+            parsed.scopes,
+            vec![Scope::new("read".into()), Scope::new("write".into())]
+        );
+    }
+
+    #[test]
+    fn test_valid_array() {
+        let json = json!({ "scopes": ["read", "write"] });
+        let parsed: TokenResponse = serde_json::from_value(json).unwrap();
+        assert_eq!(
+            parsed.scopes,
+            vec![Scope::new("read".into()), Scope::new("write".into())]
+        );
+    }
+
+    #[test]
+    fn test_empty_string_should_fail() {
+        let json = json!({ "scopes": "" });
+        let result: Result<TokenResponse, _> = serde_json::from_value(json);
+        assert!(result.is_err());
+        assert!(
+            result
+                .unwrap_err()
+                .to_string()
+                .contains("at least one scope")
+        );
+    }
+
+    #[test]
+    fn test_empty_array_should_fail() {
+        let json = json!({ "scopes": [] });
+        let result: Result<TokenResponse, _> = serde_json::from_value(json);
+        assert!(result.is_err());
+        assert!(
+            result
+                .unwrap_err()
+                .to_string()
+                .contains("at least one scope")
+        );
     }
 }
