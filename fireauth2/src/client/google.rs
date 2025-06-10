@@ -203,12 +203,8 @@ impl GoogleOAuthClient {
             }
 
             let refresh_token = token.to_owned().into_secret();
-            let scope = response
-                .scopes()
-                .map(|scopes| {
-                    scopes.iter().map(|scope| scope.to_string()).collect()
-                })
-                .unwrap_or_default();
+            let scope =
+                response.scopes().map(Vec::to_owned).unwrap_or_default();
 
             let google_user = GoogleUser {
                 id: google_user_id, // Note: this field is not saved to Firestore
