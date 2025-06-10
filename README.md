@@ -1,18 +1,19 @@
 # fireauth2
 
-An OAuth 2.0 Rust server for Google Sign-In with first-class Firebase Authentication support.
+Google OAuth 2.0 flows with first-class Firebase Authentication support
 
-> ⚠️ **Experimental Software**
+> 🧪 **Experimental Software**
 >
 > This project is in an experimental state and **not production-ready**.  
 > It may lack features, contain bugs, and is subject to **breaking changes without notice**.
 >
-> You are welcome to fork and adapt the implementation to suit your specific requirements.
+> You are welcome to fork and adapt this implementation to suit your specific needs, provided you comply with the terms of the [**license**](./LICENSE) included in this project.
 
 **You may be looking for**:
 
 - [Overview](#overview)
 - [Getting Started](#getting-started)
+- [Local Development](#development)
 - [License](#license)
 
 For more details, see the [Documentation](/docs/01_getting_started.md) section.
