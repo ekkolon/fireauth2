@@ -199,58 +199,7 @@ impl GoogleOAuthClient {
             let google_user_id = id_token_payload.sub.clone();
 
             if config.revoke_existing_tokens {
-                // Revoke existing refresh token, if any
-                let existing_google_user_result =
-                    self.repository.get(&google_user_id).await;
-                match existing_google_user_result {
-                    Err(err) => {
-                        // TODO: Maybe return an error
-                        // return Err(err);
-                        log::debug!(
-                            "Failed to update Google user: {}",
-                            &err.to_string()
-                        );
-                    }
-                    Ok(None) => {
-                        // No User record
-                        log::debug!(
-                            "Skipping token revocation. No record found for Google User ID"
-                        );
-                    }
-                    Ok(Some(user)) => {
-                        if user.refresh_token.is_none() {
-                            log::debug!(
-                                "Skipping token revocation. User record is missing refresh token"
-                            );
-                        }
-
-                        if let Some(token) = user.refresh_token {
-                            // Revoke refresh token
-                            let refresh_token = RefreshToken::new(token);
-                            let revocable_token =
-                                StandardRevocableToken::RefreshToken(
-                                    refresh_token,
-                                );
-
-                            log::debug!("Preparing for token revocation");
-                            match self
-                                .revoke_revocable_token(revocable_token)
-                                .await
-                            {
-                                Err(err) => {
-                                    // TODO: Maybe return an error
-                                    log::debug!(
-                                        "Token revocation failed: {}",
-                                        &err.to_string()
-                                    );
-                                }
-                                Ok(()) => {
-                                    log::debug!("Token successfully revoked");
-                                }
-                            }
-                        }
-                    }
-                }
+                self.revoke_existing_tokens(&google_user_id).await;
             }
 
             let refresh_token = token.to_owned().into_secret();
@@ -370,6 +319,55 @@ impl GoogleOAuthClient {
         let redirect_uri = RedirectUrl::from_url(uri);
         self.client = self.client.set_redirect_uri(redirect_uri);
         self
+    }
+
+    async fn revoke_existing_tokens(&self, user_id: &str) {
+        // Revoke existing refresh token, if any
+        let existing_google_user_result = self.repository.get(user_id).await;
+        match existing_google_user_result {
+            Err(err) => {
+                // TODO: Maybe return an error
+                // return Err(err);
+                log::debug!(
+                    "Failed to update Google user: {}",
+                    &err.to_string()
+                );
+            }
+            Ok(None) => {
+                // No User record
+                log::debug!(
+                    "Skipping token revocation. No record found for Google User ID"
+                );
+            }
+            Ok(Some(user)) => {
+                if user.refresh_token.is_none() {
+                    log::debug!(
+                        "Skipping token revocation. User record is missing refresh token"
+                    );
+                }
+
+                if let Some(token) = user.refresh_token {
+                    // Revoke refresh token
+                    let refresh_token = RefreshToken::new(token);
+                    let revocable_token =
+                        StandardRevocableToken::RefreshToken(refresh_token);
+
+                    log::debug!("Preparing for token revocation");
+                    match self.revoke_revocable_token(revocable_token).await {
+                        Err(err) => {
+                            // TODO: Maybe return an error
+                            log::debug!(
+                                "Token revocation failed: {}",
+                                &err.to_string()
+                            );
+                        }
+                        Ok(()) => {
+                            log::debug!("Token successfully revoked");
+                        }
+                    }
+                }
+            }
+        }
     }
 
     async fn revoke_revocable_token(
