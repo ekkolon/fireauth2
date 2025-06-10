@@ -1,10 +1,11 @@
-use super::GoogleOAuthExtraTokenFields;
-use super::config::GoogleOAuthClientConfig;
-use super::types::{
-    AuthRedirectResponse, ExchangeAuthorizationCodeConfig,
+use super::authorization::{
+    AuthorizationResponse, ExchangeAuthorizationCodeConfig,
     ExchangeRefreshTokenResponse, RequestAccessTokenConfig,
-    RequestAccessTokenResponse, ToExtraParams, TokenRevocationConfig,
+    RequestAccessTokenResponse, ToExtraParams,
 };
+use super::config::GoogleOAuthClientConfig;
+use super::extra_fields::GoogleOAuthExtraTokenFields;
+use super::revocation::TokenRevocationConfig;
 use crate::models::GoogleUser;
 use crate::repositories::GoogleUserRepository;
 
@@ -132,10 +133,10 @@ impl GoogleOAuthClient {
     pub async fn exchange_authorization_code(
         &self,
         config: ExchangeAuthorizationCodeConfig,
-    ) -> crate::Result<AuthRedirectResponse> {
+    ) -> crate::Result<AuthorizationResponse> {
         // Validate CSRF token from query against session.
         if config.csrf_token != config.state {
-            let response = AuthRedirectResponse::new_error(
+            let response = AuthorizationResponse::new_error(
                 config.redirect_to,
                 "CSRF token mismatch",
             );
@@ -161,7 +162,7 @@ impl GoogleOAuthClient {
         let response = match token_result {
             Ok(token) => token,
             Err(err) => {
-                let response = AuthRedirectResponse::new_error(
+                let response = AuthorizationResponse::new_error(
                     config.redirect_to,
                     err.to_string(),
                 );
@@ -174,7 +175,7 @@ impl GoogleOAuthClient {
         let id_token_payload = match self.validate_id_token(id_token).await {
             Ok(token) => token,
             Err(err) => {
-                let response = AuthRedirectResponse::new_error(
+                let response = AuthorizationResponse::new_error(
                     config.redirect_to,
                     err.to_string(),
                 );
@@ -221,7 +222,7 @@ impl GoogleOAuthClient {
         }
 
         let redirect_response =
-            AuthRedirectResponse::new_success(config.redirect_to, response);
+            AuthorizationResponse::new_success(config.redirect_to, response);
 
         Ok(redirect_response)
     }

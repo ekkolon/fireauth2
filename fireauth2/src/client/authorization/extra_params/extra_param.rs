@@ -6,7 +6,7 @@ use std::{borrow::Cow, ops::Deref};
 /// Provides a strongly typed representation of common extra parameters
 /// as well as utilities for conversion to query parameter formats.
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct ExtraParam(&'static str);
+pub struct ExtraParam(pub(super) &'static str);
 
 impl Deref for ExtraParam {
     type Target = str;

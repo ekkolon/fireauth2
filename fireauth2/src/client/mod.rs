@@ -1,6 +1,12 @@
+mod authorization;
 mod config;
+mod extra_fields;
 mod google;
-mod types;
+mod introspection;
+mod revocation;
 
+pub use authorization::*;
+pub use extra_fields::*;
 pub use google::*;
-pub use types::*;
+pub use introspection::*;
+pub use revocation::*;
