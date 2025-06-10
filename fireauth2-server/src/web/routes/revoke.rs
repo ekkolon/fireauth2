@@ -1,5 +1,5 @@
 use crate::Result;
-use crate::web::extractors::FireAuth2;
+use crate::web::extractors::FireAuth;
 use actix_firebase_auth::{FirebaseUser, GoogleUserId};
 use actix_web::{HttpResponse, post, web};
 use fireauth2::{TokenRevocationConfig, TokenRevocationPayload};
@@ -44,7 +44,7 @@ use fireauth2::{TokenRevocationConfig, TokenRevocationPayload};
 /// ---
 #[post("/revoke")]
 pub async fn revoke_token(
-    fireauth2: FireAuth2,
+    fireauth2: FireAuth,
     firebase_user: FirebaseUser,
     payload: web::Json<TokenRevocationPayload>,
 ) -> Result<HttpResponse> {

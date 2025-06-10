@@ -1,6 +1,9 @@
-mod config;
-mod google;
-mod types;
+pub(crate) mod authorization;
+pub(crate) mod config;
+pub(crate) mod google;
+pub(crate) mod introspection;
+pub(crate) mod revocation;
 
-pub use google::*;
-pub use types::*;
+pub use authorization::*;
+pub use introspection::*;
+pub use revocation::*;

@@ -1,5 +1,5 @@
 use crate::Result;
-use crate::web::extractors::FireAuth2;
+use crate::web::extractors::FireAuth;
 use actix_firebase_auth::{FirebaseUser, GoogleUserId};
 use actix_web::{HttpResponse, post};
 
@@ -58,7 +58,7 @@ use actix_web::{HttpResponse, post};
 ///   Once validated, use Firebase Admin SDK to securely fetch and revoke associated refresh tokens.
 #[post("/token")]
 pub async fn exchange_refresh_token(
-    fireauth2: FireAuth2,
+    fireauth2: FireAuth,
     firebase_user: FirebaseUser,
 ) -> Result<HttpResponse> {
     let google_user_id = GoogleUserId::try_from(&firebase_user)?;

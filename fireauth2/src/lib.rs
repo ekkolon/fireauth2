@@ -29,7 +29,7 @@
 //!
 //! ```rust
 //! use fireauth2::{CsrfToken, PkceCodeVerifier};
-//! use fireauth2::GoogleOAuthClient;
+//! use fireauth2::FireAuthClient;
 //!
 //! // TODO: Initialize client, perform authorization code exchange
 //! ```
@@ -52,13 +52,15 @@
 
 mod client;
 mod error;
+mod fireauth;
 mod models;
 mod repositories;
 
 // Re-export core modules for easy access
 pub use client::*;
 pub use error::*;
+pub use fireauth::*;
 pub use models::*;
 
-// Re-export oauth types
+// Re-export oauth2 types
 pub use oauth2::{CsrfToken, PkceCodeVerifier};
