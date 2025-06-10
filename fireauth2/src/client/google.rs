@@ -132,7 +132,6 @@ impl GoogleOAuthClient {
 
     /// Exchanges an authorization code for an access token.
     /// This method also applies the PKCE verifier and any additional parameters.
-    #[expect(clippy::too_many_lines)]
     pub async fn exchange_authorization_code(
         &self,
         config: ExchangeAuthorizationCodeConfig,
