@@ -2,7 +2,7 @@ use crate::Result;
 use crate::web::extractors::FireAuth2;
 use crate::web::session::Session;
 use crate::web::utils::get_referer_url;
-use fireauth2::RequestAccessTokenPayload;
+use fireauth2::{RequestAccessTokenConfig, RequestAccessTokenPayload};
 
 use actix_web::http::header;
 use actix_web::{HttpRequest, HttpResponse, get, web};
@@ -59,8 +59,6 @@ pub async fn authorize(
     fireauth2: FireAuth2,
     query: web::Query<RequestAccessTokenPayload>,
 ) -> Result<HttpResponse> {
-    let response = fireauth2.request_access_token(&query.extra_params);
-
     let redirect_to = query
         .redirect_uri
         .clone()
@@ -72,11 +70,15 @@ pub async fn authorize(
     // (todo) Verify that it's an http/s scheme
     let redirect_uri = Url::parse(&redirect_uri_decoded)?;
 
+    let payload = query.into_inner();
+    let config = RequestAccessTokenConfig::from(&payload);
+    let response = fireauth2.request_access_token(&config);
+
     let session = Session::new(
         response.pkce_verifier(),
         response.csrf_token(),
         redirect_uri,
-        query.extra_params.clone(),
+        payload.extra_params,
     );
 
     let redirect_response = HttpResponse::Found()
