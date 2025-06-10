@@ -1,3 +1,4 @@
+use oauth2::Scope;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
@@ -19,7 +20,7 @@ pub struct GoogleUser {
     pub(crate) refresh_token: Option<String>,
 
     /// `OAuth2` scopes granted to the user.
-    pub(crate) scope: Vec<String>,
+    pub(crate) scope: Vec<Scope>,
 }
 
 // Custom `Debug` implementation to avoid exposing sensitive information.
